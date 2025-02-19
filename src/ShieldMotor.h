@@ -21,8 +21,6 @@
 #define M3B 6 //Q6 g  (0x40)
 #define M4B 7 //Q7 h  (0x80)
 
-
-
 #define FORWARD 1
 #define BACKWARD 2
 #define BRAKE 3
@@ -31,14 +29,14 @@ class ShieldMotor {
 public:
 	ShieldMotor(int motor);
 	void run(uint8_t direction, uint8_t speed);
-
-
 private:
 	int m_motor = 0;
+private:
+    void motorForward(uint8_t speed);
+    void motorBackward(uint8_t speed);
+    void motorBrake();
+private:
 	void shiftOut(uint8_t data);
-	void motorForward(uint8_t speed);
-	void motorBackward(uint8_t speed);
-	void motorBrake();
 	void setPWM1(uint8_t speed);
 	void setPWM2(uint8_t speed);
 	void setPWM3(uint8_t speed);
