@@ -30,17 +30,17 @@
 class ShieldMotor {
 public:
 	ShieldMotor(int motor);
-	void run(int8_t direction, int8_t speed);
+	void run(uint8_t direction, uint8_t speed);
 
 
 private:
 	int m_motor = 0;
-	void shiftOut(int8_t data);
-	void motorForward(int8_t speed);
-	void motorBackward(int8_t speed);
+	void shiftOut(uint8_t data);
+	void motorForward(uint8_t speed);
+	void motorBackward(uint8_t speed);
 	void motorBrake();
-	void setPWM1(int8_t speed);
-	void setPWM2(int8_t speed);
-	void setPWM3(int8_t speed);
-	void setPWM4(int8_t speed);
+	void setPWM1(uint8_t speed);
+	void setPWM2(uint8_t speed);
+	void setPWM3(uint8_t speed);
+	void setPWM4(uint8_t speed);
 };
