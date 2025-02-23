@@ -21,7 +21,7 @@ public:
     double getHeading() const;
 
     bool rotateTo(double heading); // return true if fully rotated
-    bool drive(uint8_t fromX, uint8_t fromY, uint8_t toX, uint8_t toY); // return true when at "to" position.
+    bool drive(double fromX, double fromY, uint8_t toX, uint8_t toY); // return true when at "to" position.
 private:
     double calculateHeading(double fromX, double fromY, uint8_t toX, uint8_t toY) const; // calculate heading to next position (new car heading)
     double calculateDistance(double fromX, double fromY, uint8_t toX, uint8_t toY) const;

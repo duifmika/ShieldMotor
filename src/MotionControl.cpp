@@ -33,7 +33,7 @@ bool MotionControl::rotateTo(double heading) {
     return false;
 }
 
-bool MotionControl::drive(uint8_t fromX, uint8_t fromY, uint8_t toX, uint8_t toY) {
+bool MotionControl::drive(double fromX, double fromY, uint8_t toX, uint8_t toY) {
     // TODO: make this (second)
     return false;
 }
