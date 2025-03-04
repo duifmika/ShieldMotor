@@ -8,7 +8,8 @@ public:
             ShieldMotor* frontLeft, ShieldMotor* frontRight, 
             ShieldMotor* backLeft, ShieldMotor* backRight);
 private:
-    double m_heading = 0.f; // car heading in radians where 0 is North (top of the maze)
+    double m_heading = 0.f; // direction of motion in radians where 0 is North (top of the maze)
+    double m_carRotation = 0.f; // car rotation
 
     double m_wallWidth;
     double m_cellWidth; // assuming square cells
@@ -19,6 +20,7 @@ private:
     ShieldMotor* m_backRight;
 public:
     double getHeading() const;
+    double getCarRotation() const;
 
     bool rotateTo(double heading); // return true if fully rotated
     bool drive(double fromX, double fromY, uint8_t toX, uint8_t toY); // return true when at "to" position.
