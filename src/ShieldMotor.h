@@ -34,7 +34,6 @@ public:
 private:
     int m_motor = 0;
     int m_speed = 0;
-    static uint8_t latch_state;
 private:
     void initPWM(void);
     void latch_tx(void);

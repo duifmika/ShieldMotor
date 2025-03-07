@@ -2,6 +2,7 @@
 
 uint8_t MotorsF[] = { 0,0x04,0x10,0x01,0x80 };
 uint8_t MotorsR[] = { 0,0x08,0x02,0x40,0x20 };
+static uint8_t latch_state;
 
 void ShieldMotor::run(uint8_t direction){
     switch(direction){
@@ -32,6 +33,7 @@ ShieldMotor::ShieldMotor(int motor) {
     digitalWrite(PWM0A, HIGH);
     digitalWrite(PWM0B, HIGH);
     digitalWrite(DIR_EN, LOW);
+    pinMode(M3B, OUTPUT);
 
     m_motor = motor;
     initPWM();
@@ -47,18 +49,30 @@ void ShieldMotor::shiftOut(uint8_t data) {
 }
 
 void ShieldMotor::initPWM() {
-    // Timer 1 (Motor 1 - Pin 11)
-    TCCR1A = _BV(COM1A1) | _BV(WGM10);
-    TCCR1B = _BV(WGM12) | _BV(CS11);  // Fast PWM, prescaler 8
-
-    // Timer 3 (Motor 2 & Motor 4 - Pin 5, Pin 2)
-    TCCR3A = _BV(COM3A1) | _BV(COM3B1) | _BV(COM3C1) | _BV(WGM30);
-    TCCR3B = _BV(WGM32) | _BV(CS31);  // Fast PWM, prescaler 8
-
-    // Timer 0 (Motor 3 - Pin 6)
-    TCCR0A = _BV(COM0A1) | _BV(WGM00) | _BV(WGM01);
-    TCCR0B = _BV(CS01);  // Fast PWM, prescaler 8
+    uint8_t freq = _BV(CS01);
     
+    // GOOD
+    TCCR1A |= _BV(COM1A1) | _BV(WGM10); 
+    TCCR1B = (freq & 0x7) | _BV(WGM12);
+    OCR1A = 0;
+
+    // GOOD
+    TCCR3A |= _BV(COM1C1) | _BV(WGM10); 
+    TCCR3B = (freq & 0x7) | _BV(WGM12);
+    OCR3C = 0;    
+
+    // SPEED doesnt work
+    TCCR4A |= _BV(COM1A1) | _BV(WGM10); // fast PWM, turn on oc4a
+    TCCR4B = (freq & 0x7) | _BV(WGM12);
+    //TCCR4B = 1 | _BV(WGM12);
+    OCR4A = 0;
+
+    // BAD
+    TCCR3A |= _BV(COM1A1) | _BV(WGM10); // fast PWM, turn on oc3a
+    TCCR3B = (freq & 0x7) | _BV(WGM12);
+    //TCCR4B = 1 | _BV(WGM12);
+    OCR3A = 0;    
+
 }
 
 int ShieldMotor::getSpeed() {
@@ -98,17 +112,21 @@ void ShieldMotor::motorBrake() {
 }    
 
 void ShieldMotor::setPWM1(uint8_t speed) {
+    // GOOD
     OCR1A = speed ;  // PWM via Timer1A op Arduino Mega
 }
 
 void ShieldMotor::setPWM2(uint8_t speed) {
+    // GOOD
     OCR3C = speed;  // PWM via Timer3C op Arduino Mega
 }
 
 void ShieldMotor::setPWM3(uint8_t speed) {
-    OCR0A = speed;  // PWM via Timer1A op Arduino Mega
+    // NO SPEED
+    OCR4A = speed;  // PWM via Timer1A op Arduino Mega
 }
 
 void ShieldMotor::setPWM4(uint8_t speed) {
+    //BAD
     OCR3A = speed;  // PWM via Timer3A op Arduino Mega
 }
