@@ -36,16 +36,16 @@ private:
     int m_speed = 0;
     static uint8_t latch_state;
 private:
-	void initPWM(void);
-	void latch_tx(void);
-	
-	void motorForward();
-	void motorBackward();
-	void motorBrake();
+    void initPWM(void);
+    void latch_tx(void);
+    
+    void motorForward();
+    void motorBackward();
+    void motorBrake();
 private:
-	void shiftOut(uint8_t data);
-	void setPWM1(uint8_t speed);
-	void setPWM2(uint8_t speed);
-	void setPWM3(uint8_t speed);
-	void setPWM4(uint8_t speed);
+    void shiftOut(uint8_t data);
+    void setPWM1(uint8_t speed);
+    void setPWM2(uint8_t speed);
+    void setPWM3(uint8_t speed);
+    void setPWM4(uint8_t speed);
 };
