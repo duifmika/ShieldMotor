@@ -1,15 +1,39 @@
+
 #include "ShieldMotor.h"
 
-uint8_t MotorsF[] = { 0,0x04,0x10,0x01,0x80 };
-uint8_t MotorsR[] = { 0,0x08,0x02,0x40,0x20 };
 static uint8_t latch_state;
 
 void ShieldMotor::run(uint8_t direction){
-    switch(direction){
-        case FORWARD: motorForward(); break;
-        case BACKWARD: motorBackward(); break;
-        case BRAKE: motorBrake(); break;
-        default: return;
+    uint8_t a, b;
+    switch (m_motor) {
+        case 1:
+            a = M1A; b = M1B; break;
+        case 2:
+            a = M2A; b = M2B; break;
+        case 3:
+            a = M3A; b = M3B; break;
+        case 4:
+            a = M4A; b = M4B; break;
+        default:
+            return;
+    }
+
+    switch (direction) {
+        case FORWARD:
+            latch_state |= _BV(a);
+            latch_state &= ~_BV(b); 
+            latch_tx();
+            break;
+        case BACKWARD:
+            latch_state &= ~_BV(a);
+            latch_state |= _BV(b); 
+            latch_tx();
+            break;
+        case BRAKE:
+            latch_state &= ~_BV(a);     // A and B both low
+            latch_state &= ~_BV(b); 
+            latch_tx();
+            break;
     }
 }
 
@@ -20,22 +44,18 @@ void ShieldMotor::latch_tx(void) {
 }
 
 ShieldMotor::ShieldMotor(int motor) {
+    m_motor = motor;
+
     pinMode(DIR_EN, OUTPUT);
     pinMode(DIR_SER, OUTPUT);
     pinMode(DIR_LATCH, OUTPUT);
     pinMode(DIR_CLK, OUTPUT);
-    pinMode(PWM0A, OUTPUT);
-    pinMode(PWM0B, OUTPUT);
-    pinMode(PWM2A, OUTPUT);
-    pinMode(PWM2B, OUTPUT);
-    digitalWrite(PWM2A, HIGH);
-    digitalWrite(PWM2B, HIGH);
-    digitalWrite(PWM0A, HIGH);
-    digitalWrite(PWM0B, HIGH);
-    digitalWrite(DIR_EN, LOW);
-    pinMode(M3B, OUTPUT);
 
-    m_motor = motor;
+    latch_state = 0;
+    latch_tx();
+
+    digitalWrite(DIR_EN, LOW);
+
     initPWM();
 }
 
@@ -49,30 +69,49 @@ void ShieldMotor::shiftOut(uint8_t data) {
 }
 
 void ShieldMotor::initPWM() {
-    uint8_t freq = _BV(CS01);
+    uint8_t freq = MOTOR34_8KHZ;
     
     // GOOD
-    TCCR1A |= _BV(COM1A1) | _BV(WGM10); 
-    TCCR1B = (freq & 0x7) | _BV(WGM12);
-    OCR1A = 0;
+    switch (m_motor) {
+        case 1:
+            latch_state &= ~_BV(M1A) & ~_BV(M1B); // set both motor pins to 0
+            latch_tx();
+            TCCR1A |= _BV(COM1A1) | _BV(WGM10); // fast PWM, turn on oc1a
+            TCCR1B = (freq & 0x7) | _BV(WGM12);
+            OCR1A = 0;
 
-    // GOOD
-    TCCR3A |= _BV(COM1C1) | _BV(WGM10); 
-    TCCR3B = (freq & 0x7) | _BV(WGM12);
-    OCR3C = 0;    
+            pinMode(11, OUTPUT);
+            break;
+        case 2:
+            latch_state &= ~_BV(M2A) & ~_BV(M2B); // set both motor pins to 0
+            latch_tx();
+            TCCR3A |= _BV(COM1C1) | _BV(WGM10); // fast PWM, turn on oc3c
+            TCCR3B = (freq & 0x7) | _BV(WGM12);
+            OCR3C = 0;
 
-    // SPEED doesnt work
-    TCCR4A |= _BV(COM1A1) | _BV(WGM10); // fast PWM, turn on oc4a
-    TCCR4B = (freq & 0x7) | _BV(WGM12);
-    //TCCR4B = 1 | _BV(WGM12);
-    OCR4A = 0;
+            pinMode(3, OUTPUT);
+            break;
+        case 3:
+            latch_state &= ~_BV(M3A) & ~_BV(M3B); // set both motor pins to 0
+            latch_tx();
 
-    // BAD
-    TCCR3A |= _BV(COM1A1) | _BV(WGM10); // fast PWM, turn on oc3a
-    TCCR3B = (freq & 0x7) | _BV(WGM12);
-    //TCCR4B = 1 | _BV(WGM12);
-    OCR3A = 0;    
+            TCCR4A |= _BV(COM1A1) | _BV(WGM10); // fast PWM, turn on oc4a
+            TCCR4B = (freq & 0x7) | _BV(WGM12);
+            OCR4A = 0;
 
+            pinMode(6, OUTPUT);
+            break;
+        case 4:
+            latch_state &= ~_BV(M4A) & ~_BV(M4B); // set both motor pins to 0
+            latch_tx();
+            TCCR3A |= _BV(COM1A1) | _BV(WGM10); // fast PWM, turn on oc3a
+            TCCR3B = (freq & 0x7) | _BV(WGM12);
+            //TCCR4B = 1 | _BV(WGM12);
+            OCR3A = 0;
+
+            pinMode(5, OUTPUT);
+            break;
+    }
 }
 
 int ShieldMotor::getSpeed() {
@@ -93,24 +132,6 @@ void ShieldMotor::setSpeed(uint8_t speed) {
   }
 }
 
-void ShieldMotor::motorForward() {
-    latch_state |= MotorsF[m_motor];  // Zet Forward bit aan
-    latch_state &= ~MotorsR[m_motor]; // Zet Reverse bit uit
-    latch_tx();                       // Verstuur complete latch_state
-}
-
-void ShieldMotor::motorBackward() {
-    latch_state |= MotorsR[m_motor];  // Zet Reverse bit aan
-    latch_state &= ~MotorsF[m_motor]; // Zet Forward bit uit
-    latch_tx();                       // Verstuur complete latch_state
-}
-
-void ShieldMotor::motorBrake() {
-    latch_state &= ~MotorsF[m_motor];  // Zet Forward bit uit
-    latch_state &= ~MotorsR[m_motor];  // Zet Reverse bit uit
-    latch_tx();                        // Verstuur complete latch_state
-}    
-
 void ShieldMotor::setPWM1(uint8_t speed) {
     // GOOD
     OCR1A = speed ;  // PWM via Timer1A op Arduino Mega
@@ -130,3 +151,4 @@ void ShieldMotor::setPWM4(uint8_t speed) {
     //BAD
     OCR3A = speed;  // PWM via Timer3A op Arduino Mega
 }
+
