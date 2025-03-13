@@ -8,9 +8,9 @@
 #define PWM2A 11 
 #define PWM2B 3 
                  
-#define DIR_CLK   4  //SHCP 
-#define DIR_LATCH 12 //STCP
-#define DIR_ENABLE    7  //OE 
+#define DIR_CLK    4  //SHCP 
+#define DIR_LATCH  12 //STCP
+#define DIR_ENABLE 7  //OE 
 #define DIR_DATA   8  //DS 
 
 #define MOTOR1A 2 
@@ -25,9 +25,9 @@
 #define INVALID_MOTOR 0
 
 enum Direction : uint8_t {
-    FORWARD = 1,
+    FORWARD  = 1,
     BACKWARD = 2,
-    RELEASE = 3,
+    RELEASE  = 3,
 };
 
 class ShieldMotor {
