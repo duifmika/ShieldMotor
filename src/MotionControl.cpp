@@ -27,7 +27,9 @@ double MotionControl::calculateHeading(double fromX, double fromY, uint8_t toX, 
 }
 
 double MotionControl::calculateDistance(double fromX, double fromY, uint8_t toX, uint8_t toY) const {
-    return abs((m_cellWidth+m_wallWidth)*(toX-fromX + toY-fromY));
+    double deltaX = toX - fromX;
+    double deltaY = toY - fromY;
+    return sqrt(deltaX * deltaX + deltaY * deltaY) * (m_cellWidth + m_wallWidth);
 }
 
 bool MotionControl::rotateTo(double heading) {
