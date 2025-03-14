@@ -24,7 +24,7 @@
 
 #define INVALID_MOTOR 0
 
-enum Direction : uint8_t {
+enum Direction : int8_t {
     FORWARD  = 1,
     BACKWARD = 2,
     RELEASE  = 3,
@@ -34,11 +34,11 @@ class ShieldMotor {
 public:
     ShieldMotor(int motor);
 
-    void run(Direction dir);
-    void setSpeed(uint8_t speed);
-    int  getSpeed();
+    void    run(Direction dir);
+    void    setSpeed(uint8_t speed);
+    uint8_t getSpeed();
 private:
-    uint8_t m_motor = 0;
+    int8_t m_motor = 0;
     uint8_t m_speed = 0;
     
     static uint8_t latch_state;
