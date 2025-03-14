@@ -22,11 +22,11 @@ double MotionControl::getCarRotation() const {
     return m_carRotation;
 }
 
-double MotionControl::calculateHeading(double fromX, double fromY, uint8_t toX, uint8_t toY) const {
+double MotionControl::calculateHeading(double fromX, double fromY, int8_t toX, int8_t toY) const {
     return atan2(toY-fromY, toX-fromX) + 0.5*PI;
 }
 
-double MotionControl::calculateDistance(double fromX, double fromY, uint8_t toX, uint8_t toY) const {
+double MotionControl::calculateDistance(double fromX, double fromY, int8_t toX, int8_t toY) const {
     double deltaX = toX - fromX;
     double deltaY = toY - fromY;
     return sqrt(deltaX * deltaX + deltaY * deltaY) * (m_cellWidth + m_wallWidth);
@@ -38,7 +38,7 @@ bool MotionControl::rotateTo(double heading) {
     return false;
 }
 
-bool MotionControl::drive(double fromX, double fromY, uint8_t toX, uint8_t toY) {
+bool MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY) {
     // update m_carRotation and m_heading
     return false;
 }
