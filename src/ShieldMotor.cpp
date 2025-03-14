@@ -115,7 +115,7 @@ void ShieldMotor::initPWM() {
     }
 }
 
-int ShieldMotor::getSpeed() {
+uint8_t ShieldMotor::getSpeed() {
     return m_speed;
 }
 
