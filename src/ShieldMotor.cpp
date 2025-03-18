@@ -7,8 +7,8 @@ void ShieldMotor::run(Direction dir) {
         return;
 
     uint8_t a, b;
-    constexpr uint8_t MOTOR_BIT_A[4] = {MOTOR1A, MOTOR2A, MOTOR3A, MOTOR4A};
-    constexpr uint8_t MOTOR_BIT_B[4] = {MOTOR1B, MOTOR2B, MOTOR3B, MOTOR4B};
+    constexpr uint8_t MOTOR_BIT_A[4] = {MOTOR1A, MOTOR2B, MOTOR3B, MOTOR4A};
+    constexpr uint8_t MOTOR_BIT_B[4] = {MOTOR1B, MOTOR2A, MOTOR3A, MOTOR4B};
     
     // convert base from 1 to 0
     a = MOTOR_BIT_A[m_motor-1];
