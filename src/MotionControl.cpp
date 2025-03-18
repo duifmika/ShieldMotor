@@ -40,5 +40,11 @@ bool MotionControl::rotateTo(double heading) {
 
 bool MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY) {
     // update m_carRotation and m_heading
+    m_carRotation = 0.;
+    double distCm = calculateDistance(fromX, fromY, toX, toY);
+    if (distCm < 2)
+        return true;
+
+    m_heading = calculateHeading(fromX, fromY, toX, toY);
     return false;
 }
