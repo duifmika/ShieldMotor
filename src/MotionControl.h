@@ -1,5 +1,12 @@
 #include "ShieldMotor.h"
 
+enum class CompassDirMC : int8_t {
+    North = (1 << 0),
+    South = (1 << 1),
+    East = (1 << 2),
+    West = (1 << 3)
+};
+
 class MotionControl {
 public:
     MotionControl() = default;
@@ -23,7 +30,14 @@ public:
     double getCarRotation() const;
 
     void drive(double fromX, double fromY, int8_t toX, int8_t toY); 
+    void goForward();
+    void goLeft();
+    void goBackward();
+    void goRight();
+    void goBrake();
+
 private:
+    CompassDirMC MotionControl::radiansToDirection(double angleRad) const;
     double calculateHeading(double fromX, double fromY, int8_t toX, int8_t toY) const; // calculate heading to next position (new car heading)
     double calculateDistance(double fromX, double fromY, int8_t toX, int8_t toY) const;
 
