@@ -9,6 +9,7 @@ void MotionControl::goForward(){
 }
 
 void MotionControl::goLeft(){
+    // replace this
     m_frontLeft->run(BACKWARD);
     m_frontRight->run(FORWARD);
     m_backLeft->run(FORWARD);
@@ -23,6 +24,7 @@ void MotionControl::goBackward(){
 }
 
 void MotionControl::goRight(){
+    // replace this
     m_frontLeft->run(FORWARD);
     m_frontRight->run(BACKWARD);
     m_backLeft->run(BACKWARD);
@@ -100,12 +102,7 @@ void MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY) {
         double offX = fromX - floor(fromX);
         double offY = fromY - floor(fromY);
 
-        m_frontLeft->setSpeed(150);
-        m_frontRight->setSpeed(150);
-        m_backLeft->setSpeed(150);
-        m_backRight->setSpeed(150); 
-
-        if (radiansToDirection(m_carRotation) == CompassDirMC::North){
+        if (radiansToDirection(m_carRotation) == CompassDirMC::North) {
             if (offX >= 0.05) {
                 goLeft();
             }
@@ -115,7 +112,7 @@ void MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY) {
 
         }
 
-        if (radiansToDirection(m_carRotation) == CompassDirMC::South){
+        if (radiansToDirection(m_carRotation) == CompassDirMC::South) {
             if (fabs(offX) >= 0.05) {
                 goRight();
             }
@@ -124,7 +121,7 @@ void MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY) {
             }
         }
 
-        if (radiansToDirection(m_carRotation) == CompassDirMC::East){
+        if (radiansToDirection(m_carRotation) == CompassDirMC::East) {
             if (fabs(offY) >= 0.05) {
                 goLeft();
             }
@@ -133,7 +130,7 @@ void MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY) {
             }
         }
 
-        if (radiansToDirection(m_carRotation) == CompassDirMC::West){
+        if (radiansToDirection(m_carRotation) == CompassDirMC::West) {
             if (fabs(offY) >= 0.05) {
                 goRight();
             }
@@ -142,8 +139,14 @@ void MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY) {
             }
         }
 
-        delay(50) // small adjustment time
+        m_frontLeft->setSpeed(150);
+        m_frontRight->setSpeed(150);
+        m_backLeft->setSpeed(150);
+        m_backRight->setSpeed(150); 
+
+        delay(100); // small adjustment time
         goBrake();
+        return;
     }
 
     goForward();
