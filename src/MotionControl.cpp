@@ -1,6 +1,10 @@
 #include "MotionControl.h"
 #include <math.h>
 
+#define BRAKE_TIME 100
+#define CORRECTION_TIME 50
+#define CORRECTION_MIN_VALUE 0.05 // this times (28+4.2) is the cm offset from the middle 0.05=1.61cm
+
 void MotionControl::goForward(){
     m_frontLeft->run(FORWARD);
     m_frontRight->run(FORWARD);
@@ -81,15 +85,12 @@ CompassDirMC MotionControl::radiansToDirection(double angleRad) const {
 
 void MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY) {
     // update m_carRotation and m_heading
-    double distCm = calculateDistance(fromX, fromY, toX, toY);
-
     m_heading = calculateHeading(fromX, fromY, toX, toY);
     if (fabs(m_heading - m_carRotation) > 0.01) {
-        // if dist is very low (the car has arrived) stop the car if in motion
-        // Adjust the 3 cm dist if it doesnt work
-        if (distCm < 3 && m_frontLeft->getSpeed() > 0) {
+        // brake if we need to change direction
+        if (m_frontLeft->getSpeed() > 0) {
             goBrake();
-            delay(100); // remtijd bepalen
+            delay(BRAKE_TIME); 
         }
 
         // rotate 90 degrees to the right heading 
@@ -103,38 +104,38 @@ void MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY) {
         double offY = fromY - floor(fromY);
 
         if (radiansToDirection(m_carRotation) == CompassDirMC::North) {
-            if (offX >= 0.05) {
+            if (offX >= CORRECTION_MIN_VALUE) {
                 goLeft();
             }
-            else if(offX <= -0.05) {
+            else if(offX <= -CORRECTION_MIN_VALUE) {
                 goRight();
             }
 
         }
 
         if (radiansToDirection(m_carRotation) == CompassDirMC::South) {
-            if (fabs(offX) >= 0.05) {
+            if (fabs(offX) >= CORRECTION_MIN_VALUE) {
                 goRight();
             }
-            else if(fabs(offX) <= -0.05){
+            else if(fabs(offX) <= -CORRECTION_MIN_VALUE){
                 goLeft();
             }
         }
 
         if (radiansToDirection(m_carRotation) == CompassDirMC::East) {
-            if (fabs(offY) >= 0.05) {
+            if (fabs(offY) >= CORRECTION_MIN_VALUE) {
                 goLeft();
             }
-            else if(fabs(offY) <= -0.05) {
+            else if(fabs(offY) <= -CORRECTION_MIN_VALUE) {
                 goRight();
             }
         }
 
         if (radiansToDirection(m_carRotation) == CompassDirMC::West) {
-            if (fabs(offY) >= 0.05) {
+            if (fabs(offY) >= CORRECTION_MIN_VALUE) {
                 goRight();
             }
-            else if(fabs(offY) <= -0.05) {
+            else if(fabs(offY) <= -CORRECTION_MIN_VALUE) {
                 goLeft();
             }
         }
@@ -144,7 +145,7 @@ void MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY) {
         m_backLeft->setSpeed(150);
         m_backRight->setSpeed(150); 
 
-        delay(100); // small adjustment time
+        delay(CORRECTION_TIME); // small adjustment time
         goBrake();
         return;
     }

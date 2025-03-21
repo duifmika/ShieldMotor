@@ -35,9 +35,10 @@ public:
     void goLeft();
     void goRight();
     void goBrake();
+
+    static double calculateDistance(double fromX, double fromY, int8_t toX, int8_t toY);
 private:
     CompassDirMC radiansToDirection(double angleRad) const;
-    double calculateHeading(double fromX, double fromY, int8_t toX, int8_t toY) const; // calculate heading to next position (new car heading)
-    double calculateDistance(double fromX, double fromY, int8_t toX, int8_t toY) const;
+    double calculateHeading(double fromX, double fromY, int8_t toX, int8_t toY) const; 
 
 };
