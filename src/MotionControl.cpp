@@ -32,19 +32,26 @@ double MotionControl::calculateDistance(double fromX, double fromY, int8_t toX, 
     return sqrt(deltaX * deltaX + deltaY * deltaY) * (m_cellWidth + m_wallWidth);
 }
 
-bool MotionControl::rotateTo(double heading) {
-    // Use motors like this:
-    // m_frontLeft->run(FORWARD, 255);
-    return false;
-}
-
-bool MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY) {
+void MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY) {
     // update m_carRotation and m_heading
-    m_carRotation = 0.;
     double distCm = calculateDistance(fromX, fromY, toX, toY);
-    if (distCm < 2)
-        return true;
 
     m_heading = calculateHeading(fromX, fromY, toX, toY);
-    return false;
+    if (fabs(m_heading - m_carRotation) > 0.01) {
+        // if dist is very low (the car has arrived) stop the car if in motion
+        // Adjust the 3 cm dist if it doesnt work
+        if (distCm < 3 && m_frontLeft->getSpeed() > 0) {
+            // Stop the car
+        }
+
+        // rotate 90 degrees to the right heading 
+
+        m_carRotation = m_heading;
+        return;
+    }
+
+    // correction
+
+    // go forward
+
 }
