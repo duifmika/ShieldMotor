@@ -36,7 +36,7 @@ public:
     void goRight();
     void goBrake();
 
-    static double calculateDistance(double fromX, double fromY, int8_t toX, int8_t toY);
+    double calculateDistance(double fromX, double fromY, int8_t toX, int8_t toY) const;
 private:
     CompassDirMC radiansToDirection(double angleRad) const;
     double calculateHeading(double fromX, double fromY, int8_t toX, int8_t toY) const; 
