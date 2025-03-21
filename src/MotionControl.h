@@ -31,13 +31,12 @@ public:
 
     void drive(double fromX, double fromY, int8_t toX, int8_t toY); 
     void goForward();
-    void goLeft();
     void goBackward();
+    void goLeft();
     void goRight();
     void goBrake();
-
 private:
-    CompassDirMC MotionControl::radiansToDirection(double angleRad) const;
+    CompassDirMC radiansToDirection(double angleRad) const;
     double calculateHeading(double fromX, double fromY, int8_t toX, int8_t toY) const; // calculate heading to next position (new car heading)
     double calculateDistance(double fromX, double fromY, int8_t toX, int8_t toY) const;
 

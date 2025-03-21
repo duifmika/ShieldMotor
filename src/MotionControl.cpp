@@ -2,35 +2,40 @@
 #include <math.h>
 
 void MotionControl::goForward(){
-    m_frontLeft-> run(FORWARD);
-    m_frontRight-> run(FORWARD);
-    m_backLeft-> run(FORWARD);
-    m_backRight-> run(FORWARD);
+    m_frontLeft->run(FORWARD);
+    m_frontRight->run(FORWARD);
+    m_backLeft->run(FORWARD);
+    m_backRight->run(FORWARD);
 }
+
 void MotionControl::goLeft(){
-    m_frontLeft-> run(BACKWARD);
-    m_frontRight-> run(FORWARD);
-    m_backLeft-> run(FORWARD);
-    m_backRight-> run(BACKWARD);   
+    m_frontLeft->run(BACKWARD);
+    m_frontRight->run(FORWARD);
+    m_backLeft->run(FORWARD);
+    m_backRight->run(BACKWARD);   
 }
+
 void MotionControl::goBackward(){
-    m_frontLeft-> run(BACKWARD);
-    m_frontRight-> run(BACKWARD);
-    m_backLeft-> run(BACKWARD);
-    m_backRight-> run(BACKWARD); 
+    m_frontLeft->run(BACKWARD);
+    m_frontRight->run(BACKWARD);
+    m_backLeft->run(BACKWARD);
+    m_backRight->run(BACKWARD); 
 }
+
 void MotionControl::goRight(){
-    m_frontLeft-> run(FORWARD);
-    m_frontRight-> run(BACKWARD);
-    m_backLeft-> run(BACKWARD);
-    m_backRight-> run(FORWARD); 
+    m_frontLeft->run(FORWARD);
+    m_frontRight->run(BACKWARD);
+    m_backLeft->run(BACKWARD);
+    m_backRight->run(FORWARD); 
 }
+
 void MotionControl::goBrake(){
-    m_frontLeft-> run(RELEASE);
-    m_frontRight-> run(RELEASE);
-    m_backLeft-> run(RELEASE);
-    m_backRight-> run(RELEASE);
+    m_frontLeft->run(RELEASE);
+    m_frontRight->run(RELEASE);
+    m_backLeft->run(RELEASE);
+    m_backRight->run(RELEASE);
 }
+
 void MotionControl::init(double cellWidth, double wallWidth, 
             ShieldMotor* frontLeft, ShieldMotor* frontRight, 
             ShieldMotor* backLeft, ShieldMotor* backRight) {
@@ -92,43 +97,53 @@ void MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY) {
     }
 
     if (m_frontLeft->getSpeed() == 0) {
-      double offX = fromX - floor(fromX);
-      double offY = fromY - floor(fromY);
-      if (radiansToDirection(m_carRotation) == CompassDirMC::North){
-        if (offX >= 0.05){
-          goLeft();
-        }
-        else if(offX <= -0.05){
-          goRight();
+        double offX = fromX - floor(fromX);
+        double offY = fromY - floor(fromY);
+
+        m_frontLeft->setSpeed(150);
+        m_frontRight->setSpeed(150);
+        m_backLeft->setSpeed(150);
+        m_backRight->setSpeed(150); 
+
+        if (radiansToDirection(m_carRotation) == CompassDirMC::North){
+            if (offX >= 0.05) {
+                goLeft();
+            }
+            else if(offX <= -0.05) {
+                goRight();
+            }
+
         }
 
-      }
-      if (radiansToDirection(m_carRotation) == CompassDirMC::South){
-        if (fabs(offX) >= 0.05){
-          goRight();
+        if (radiansToDirection(m_carRotation) == CompassDirMC::South){
+            if (fabs(offX) >= 0.05) {
+                goRight();
+            }
+            else if(fabs(offX) <= -0.05){
+                goLeft();
+            }
         }
-        else if(fabs(offX) <= -0.05){
-          goLeft();
-        }
-      }
-      if (radiansToDirection(m_carRotation) == CompassDirMC::East){
-        if (fabs(offY) >= 0.05){
-          goLeft();
-        }
-        else if(fabs(offY) <= -0.05){
-          goRight();
-        }
-      }
-      if (radiansToDirection(m_carRotation) == CompassDirMC::West){
-        if (fabs(offY) >= 0.05){
-          goRight();
-        }
-        else if(fabs(offY) <= -0.05){
-          goLeft();
-        }
-      }
 
-      goBrake();
+        if (radiansToDirection(m_carRotation) == CompassDirMC::East){
+            if (fabs(offY) >= 0.05) {
+                goLeft();
+            }
+            else if(fabs(offY) <= -0.05) {
+                goRight();
+            }
+        }
+
+        if (radiansToDirection(m_carRotation) == CompassDirMC::West){
+            if (fabs(offY) >= 0.05) {
+                goRight();
+            }
+            else if(fabs(offY) <= -0.05) {
+                goLeft();
+            }
+        }
+
+        delay(50) // small adjustment time
+        goBrake();
     }
 
     goForward();
