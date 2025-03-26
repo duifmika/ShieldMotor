@@ -83,7 +83,7 @@ CompassDirMC MotionControl::radiansToDirection(double angleRad) const {
     return CompassDirMC::West;
 }
 
-void MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY) {
+void MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY, double leftCm, double rightCm, double centerCm) {
     // update m_carRotation and m_heading
     m_heading = calculateHeading(fromX, fromY, toX, toY);
     if (fabs(m_heading - m_carRotation) > 0.01) {

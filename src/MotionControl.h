@@ -29,7 +29,7 @@ public:
     double getHeading() const;
     double getCarRotation() const;
 
-    void drive(double fromX, double fromY, int8_t toX, int8_t toY); 
+    void drive(double fromX, double fromY, int8_t toX, int8_t toY, double leftCm, double rightCm, double centerCm); 
     void goForward();
     void goBackward();
     void goLeft();
