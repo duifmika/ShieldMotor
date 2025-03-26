@@ -1,39 +1,77 @@
 #include "MotionControl.h"
 #include <math.h>
 
-#define BRAKE_TIME 100
+void MotionControl::goForward() {
+    if (m_driveDir != FORWARD)
+        goBrake();
 
-void MotionControl::goForward(){
     m_frontLeft->run(FORWARD);
     m_frontRight->run(FORWARD);
     m_backLeft->run(FORWARD);
     m_backRight->run(FORWARD);
-}
 
-void MotionControl::goLeft(){
-    // replace this
-    m_frontLeft->run(BACKWARD);
-    m_frontRight->run(FORWARD);
-    m_backLeft->run(FORWARD);
-    m_backRight->run(BACKWARD);   
+    m_frontLeft->setSpeed(255);
+    m_frontRight->setSpeed(255);
+    m_backLeft->setSpeed(255);
+    m_backRight->setSpeed(255);   
+ 
+    m_driveDir = FORWARD;
 }
 
 void MotionControl::goBackward(){
+    if (m_driveDir != BACKWARD)
+        goBrake();
+
     m_frontLeft->run(BACKWARD);
     m_frontRight->run(BACKWARD);
     m_backLeft->run(BACKWARD);
     m_backRight->run(BACKWARD); 
+
+    m_frontLeft->setSpeed(255);
+    m_frontRight->setSpeed(255);
+    m_backLeft->setSpeed(255);
+    m_backRight->setSpeed(255);   
+ 
+    m_driveDir = BACKWARD;
+}
+
+void MotionControl::goLeft(){
+    if (m_driveDir != RELEASE)
+        goBrake();
+
+    m_frontLeft->run(BACKWARD);
+    m_frontRight->run(FORWARD);
+    m_backLeft->run(FORWARD);
+    m_backRight->run(BACKWARD);   
+    
+    m_frontLeft->setSpeed(150);
+    m_frontRight->setSpeed(150);
+    m_backLeft->setSpeed(150);
+    m_backRight->setSpeed(150);   
+
+    delay(450);
+    goBrake();
 }
 
 void MotionControl::goRight(){
-    // replace this
+    if (m_driveDir != RELEASE)
+        goBrake();
+
     m_frontLeft->run(FORWARD);
     m_frontRight->run(BACKWARD);
     m_backLeft->run(BACKWARD);
     m_backRight->run(FORWARD); 
+
+    m_frontLeft->setSpeed(150);
+    m_frontRight->setSpeed(150);
+    m_backLeft->setSpeed(150);
+    m_backRight->setSpeed(150);   
+
+    delay(450);
+    goBrake();
 }
 
-void MotionControl::goBrake(){
+void MotionControl::goBrake(int delayMs){
     if (m_frontLeft->getSpeed() == 0) {
         return;
     }
@@ -43,7 +81,8 @@ void MotionControl::goBrake(){
     m_backLeft->run(RELEASE);
     m_backRight->run(RELEASE);
 
-    delay(BRAKE_TIME); 
+    delay(delayMs); 
+    m_driveDir = RELEASE;
 }
 
 void MotionControl::init(double cellWidth, double wallWidth, 
@@ -87,24 +126,31 @@ CompassDirMC MotionControl::radiansToDirection(double angleRad) const {
     return CompassDirMC::West;
 }
 
-void MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY, double leftCm, double rightCm, double centerCm) {
-    // update m_carRotation and m_heading
+void MotionControl::applyCorrection(double leftCm, double rightCm, double centerCm) {
+    // make left or right wheels go slower
+}
+
+bool MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY, double leftCm, double rightCm, double centerCm) {
     m_heading = calculateHeading(fromX, fromY, toX, toY);
     double deltaHeading = fabs(m_heading - m_carRotation);
-    if (deltaHeading > 0.01 && deltaHeading < (3.0/4.0*PI)) {
-        goBrake();
+    if (deltaHeading > 0.1 && deltaHeading < (3.0/4.0*PI)) {
 
         // rotate 90 degrees to the right heading 
-
+        // goRight() or goLeft()
         m_carRotation = m_heading;
-        return;
+        return false;
     }
 
     if (deltaHeading > 3.0/4.0*PI) {
-        goBrake();
-        return;
+        goBackward();
+        applyCorrection(leftCm, rightCm, centerCm);
+        // add position tracking
+        return false;
     }
 
     goForward();
-
+    applyCorrection(leftCm, rightCm, centerCm);
+    // add position tracking
+    return false;
 }
+

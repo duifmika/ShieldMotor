@@ -7,6 +7,8 @@ enum class CompassDirMC : int8_t {
     West = (1 << 3)
 };
 
+#define BRAKE_TIME 100
+
 class MotionControl {
 public:
     MotionControl() = default;
@@ -25,16 +27,19 @@ private:
     ShieldMotor* m_frontRight;
     ShieldMotor* m_backLeft;
     ShieldMotor* m_backRight;
+
+    Direction m_driveDir = FORWARD;
 public:
     double getHeading() const;
     double getCarRotation() const;
 
-    void drive(double fromX, double fromY, int8_t toX, int8_t toY, double leftCm, double rightCm, double centerCm); 
+    bool drive(double fromX, double fromY, int8_t toX, int8_t toY, double leftCm, double rightCm, double centerCm); 
+    void applyCorrection(double leftCm, double rightCm, double centerCm);
     void goForward();
     void goBackward();
     void goLeft();
     void goRight();
-    void goBrake();
+    void goBrake(int delayMs = BRAKE_TIME);
 
     double calculateDistance(double fromX, double fromY, int8_t toX, int8_t toY) const;
 private:
