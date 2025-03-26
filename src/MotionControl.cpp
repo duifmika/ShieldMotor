@@ -2,8 +2,6 @@
 #include <math.h>
 
 #define BRAKE_TIME 100
-#define CORRECTION_TIME 50
-#define CORRECTION_MIN_VALUE 0.05 // this times (28+4.2) is the cm offset from the middle 0.05=1.61cm
 
 void MotionControl::goForward(){
     m_frontLeft->run(FORWARD);
@@ -36,10 +34,16 @@ void MotionControl::goRight(){
 }
 
 void MotionControl::goBrake(){
+    if (m_frontLeft->getSpeed() == 0) {
+        return;
+    }
+
     m_frontLeft->run(RELEASE);
     m_frontRight->run(RELEASE);
     m_backLeft->run(RELEASE);
     m_backRight->run(RELEASE);
+
+    delay(BRAKE_TIME); 
 }
 
 void MotionControl::init(double cellWidth, double wallWidth, 
@@ -86,12 +90,9 @@ CompassDirMC MotionControl::radiansToDirection(double angleRad) const {
 void MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY, double leftCm, double rightCm, double centerCm) {
     // update m_carRotation and m_heading
     m_heading = calculateHeading(fromX, fromY, toX, toY);
-    if (fabs(m_heading - m_carRotation) > 0.01) {
-        // brake if we need to change direction
-        if (m_frontLeft->getSpeed() > 0) {
-            goBrake();
-            delay(BRAKE_TIME); 
-        }
+    double deltaHeading = fabs(m_heading - m_carRotation);
+    if (deltaHeading > 0.01 && deltaHeading < (3.0/4.0*PI)) {
+        goBrake();
 
         // rotate 90 degrees to the right heading 
 
@@ -99,53 +100,7 @@ void MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY, do
         return;
     }
 
-    if (m_frontLeft->getSpeed() == 0) {
-        double offX = fromX - floor(fromX);
-        double offY = fromY - floor(fromY);
-
-        if (radiansToDirection(m_carRotation) == CompassDirMC::North) {
-            if (offX >= CORRECTION_MIN_VALUE) {
-                goLeft();
-            }
-            else if(offX <= -CORRECTION_MIN_VALUE) {
-                goRight();
-            }
-
-        }
-
-        if (radiansToDirection(m_carRotation) == CompassDirMC::South) {
-            if (fabs(offX) >= CORRECTION_MIN_VALUE) {
-                goRight();
-            }
-            else if(fabs(offX) <= -CORRECTION_MIN_VALUE){
-                goLeft();
-            }
-        }
-
-        if (radiansToDirection(m_carRotation) == CompassDirMC::East) {
-            if (fabs(offY) >= CORRECTION_MIN_VALUE) {
-                goLeft();
-            }
-            else if(fabs(offY) <= -CORRECTION_MIN_VALUE) {
-                goRight();
-            }
-        }
-
-        if (radiansToDirection(m_carRotation) == CompassDirMC::West) {
-            if (fabs(offY) >= CORRECTION_MIN_VALUE) {
-                goRight();
-            }
-            else if(fabs(offY) <= -CORRECTION_MIN_VALUE) {
-                goLeft();
-            }
-        }
-
-        m_frontLeft->setSpeed(150);
-        m_frontRight->setSpeed(150);
-        m_backLeft->setSpeed(150);
-        m_backRight->setSpeed(150); 
-
-        delay(CORRECTION_TIME); // small adjustment time
+    if (deltaHeading > 3.0/4.0*PI) {
         goBrake();
         return;
     }
