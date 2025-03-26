@@ -41,8 +41,8 @@ void MotionControl::goLeft(){
 
     m_frontLeft->run(BACKWARD);
     m_frontRight->run(FORWARD);
-    m_backLeft->run(FORWARD);
-    m_backRight->run(BACKWARD);   
+    m_backLeft->run(BACKWARD);
+    m_backRight->run(FORWARD);   
     
     m_frontLeft->setSpeed(150);
     m_frontRight->setSpeed(150);
@@ -59,8 +59,8 @@ void MotionControl::goRight(){
 
     m_frontLeft->run(FORWARD);
     m_frontRight->run(BACKWARD);
-    m_backLeft->run(BACKWARD);
-    m_backRight->run(FORWARD); 
+    m_backLeft->run(FORWARD);
+    m_backRight->run(BACKWARD); 
 
     m_frontLeft->setSpeed(150);
     m_frontRight->setSpeed(150);
