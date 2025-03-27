@@ -134,9 +134,14 @@ bool MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY, do
     m_heading = calculateHeading(fromX, fromY, toX, toY);
     double deltaHeading = fabs(m_heading - m_carRotation);
     if (deltaHeading > 0.1 && deltaHeading < (3.0/4.0*PI)) {
-
-        // rotate 90 degrees to the right heading 
-        // goRight() or goLeft()
+      double diff = (m_heading - m_carRotation) / PI;
+      if (fabs(fabs(diff) - 1.5) < 0.0001) {
+        diff < -1.49 ?  goRight() : goLeft();
+      } else if (diff > 0) {
+        goRight();
+      } else if (diff < 0) {
+        goLeft();
+      }
         m_carRotation = m_heading;
         return false;
     }
