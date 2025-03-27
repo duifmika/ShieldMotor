@@ -34,8 +34,8 @@ public:
     double getHeading() const;
     double getCarRotation() const;
 
-    bool drive(double fromX, double fromY, int8_t toX, int8_t toY, double leftCm, double rightCm, double centerCm); 
-    void applyCorrection(double leftCm, double rightCm, double centerCm);
+    void drive(double fromX, double fromY, int8_t toX, int8_t toY, double leftCm, double rightCm, double centerCm); 
+    void applyCorrection(double leftCm, double rightCm);
     void goForward();
     void goBackward();
     void goLeft();

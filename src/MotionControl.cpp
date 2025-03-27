@@ -128,30 +128,95 @@ CompassDirMC MotionControl::radiansToDirection(double angleRad) const {
 }
 
 
-void MotionControl::applyCorrection(double leftCm, double rightCm, double centerCm) {
-    int normaal = m_frontLeft->getSpeed();  
-    int slower = 150;
+void MotionControl::applyCorrection(double leftCm, double rightCm) {
+    const float Kp_pos = 4.5;
+    const float Kd_pos = 2.5;
+    const float Kp_yaw = 3.8;
+    const float Kd_yaw = 2.2;
 
-    int leftSpeed = normaal;
-    int rightSpeed = normaal;
+    const int baseSpeed = 255;
+    const int controlInterval = 50; 
 
-    if (m_driveDir == FORWARD) {
-        if (leftCm > 7 || rightCm < 5) leftSpeed = slower;
-        if (rightCm > 7 || leftCm < 5) rightSpeed = slower;
-    } 
-    else if (m_driveDir == BACKWARD) {
-        if (leftCm > 7 || rightCm < 5) rightSpeed = slower;
-        if (rightCm > 7 || leftCm < 5) leftSpeed = slower;
+    static float centerDeadband = 1.0; 
+
+    // PID state
+    static float prev_error_pos = 0;
+    static float prev_error_yaw = 0;
+    static float prev_dLeft = 0;
+    static float prev_dRight = 0;
+    static unsigned long lastTime = 0;
+
+    if (millis() - lastTime < controlInterval) {
+        return;
     }
 
-    // Stel snelheden maar één keer in
-    m_frontLeft->setSpeed(leftSpeed);
-    m_backLeft->setSpeed(leftSpeed);
-    m_frontRight->setSpeed(rightSpeed);
-    m_backRight->setSpeed(rightSpeed);
+    // for now I added back the offset.
+    leftCm += 2.5;
+    rightCm += 2.5;
+
+    lastTime = millis();
+
+    bool trustLeft = (leftCm <= 12.0);
+    bool trustRight = (rightCm <= 12.0);
+
+    float correction_pos = 0.0;
+    float correction_yaw = 0.0;
+    float pos_error = 0.0;
+    float yaw_error = 0.0;
+    
+    if (trustLeft || trustRight) {
+        // === POSITION ERROR ===
+        pos_error = (leftCm - rightCm) / 2.0;
+
+        if (abs(pos_error) < centerDeadband) pos_error = 0;
+
+        float derivative_pos = (pos_error - prev_error_pos) / (controlInterval / 1000.0);
+        correction_pos = Kp_pos * pos_error + Kd_pos * derivative_pos;
+        correction_pos = constrain(correction_pos, -55.0, 55.0);
+        prev_error_pos = pos_error;
+
+        // === YAW ERROR ===
+        float delta_dLeft = leftCm - prev_dLeft;
+        float delta_dRight = rightCm - prev_dRight;
+        yaw_error = delta_dLeft - delta_dRight;
+
+        if (abs(yaw_error) < 0.5) yaw_error = 0;
+
+        float derivative_yaw = (yaw_error - prev_error_yaw) / (controlInterval / 1000.0);
+        correction_yaw = Kp_yaw * yaw_error + Kd_yaw * derivative_yaw;
+        correction_yaw = constrain(correction_yaw, -55.0, 55.0);
+        prev_error_yaw = yaw_error;
+
+        prev_dLeft = leftCm;
+        prev_dRight = rightCm;
+    } else {
+        // No trustable wall → reset previous errors
+        prev_error_pos = 0;
+        prev_error_yaw = 0;
+    }
+
+    // === DYNAMIC SPEED ADJUSTMENT ===
+    float correctionMagnitude = abs(correction_pos) + abs(correction_yaw);
+    int adjustedBaseSpeed = baseSpeed - int(correctionMagnitude * 0.7);
+    adjustedBaseSpeed = constrain(adjustedBaseSpeed, 160, baseSpeed);
+
+    int speedLeft = constrain(adjustedBaseSpeed - correction_pos - correction_yaw, 0, 255);
+    int speedRight = constrain(adjustedBaseSpeed + correction_pos + correction_yaw, 0, 255);
+
+    if (m_driveDir == BACKWARD) {
+        // invert movement when going backward
+        int tmp = speedLeft;
+        speedLeft = speedRight;
+        speedRight = tmp;
+    }
+
+    m_frontLeft->setSpeed(speedLeft);
+    m_backLeft->setSpeed(speedLeft);
+    m_frontRight->setSpeed(speedRight);
+    m_backRight->setSpeed(speedRight);
 }
 
-bool MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY, double leftCm, double rightCm, double centerCm) {
+void MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY, double leftCm, double rightCm, double centerCm) {
     m_heading = calculateHeading(fromX, fromY, toX, toY);
     double deltaHeading = fabs(m_heading - m_carRotation);
     if (deltaHeading > 0.1 && deltaHeading < (3.0/4.0*PI)) {
@@ -164,18 +229,16 @@ bool MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY, do
         goLeft();
       }
         m_carRotation = m_heading;
-        return false;
+        return;
     }
 
     if (deltaHeading > 3.0/4.0*PI) {
         goBackward();
-        applyCorrection(leftCm, rightCm, centerCm);
-        // add position tracking
-        return false;
+        applyCorrection(leftCm, rightCm);
+        return;
     }
 
     goForward();
-    applyCorrection(leftCm, rightCm, centerCm);
-    // add position tracking
-    return false;
+    applyCorrection(leftCm, rightCm);
 }
+
