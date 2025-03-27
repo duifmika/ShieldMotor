@@ -18,6 +18,7 @@ void MotionControl::goForward() {
     m_driveDir = FORWARD;
 }
 
+
 void MotionControl::goBackward(){
     if (m_driveDir != BACKWARD)
         goBrake();
@@ -126,8 +127,28 @@ CompassDirMC MotionControl::radiansToDirection(double angleRad) const {
     return CompassDirMC::West;
 }
 
+
 void MotionControl::applyCorrection(double leftCm, double rightCm, double centerCm) {
-    // make left or right wheels go slower
+    int normaal = m_frontLeft->getSpeed();  
+    int slower = 150;
+
+    int leftSpeed = normaal;
+    int rightSpeed = normaal;
+
+    if (m_driveDir == FORWARD) {
+        if (leftCm > 7 || rightCm < 5) leftSpeed = slower;
+        if (rightCm > 7 || leftCm < 5) rightSpeed = slower;
+    } 
+    else if (m_driveDir == BACKWARD) {
+        if (leftCm > 7 || rightCm < 5) rightSpeed = slower;
+        if (rightCm > 7 || leftCm < 5) leftSpeed = slower;
+    }
+
+    // Stel snelheden maar één keer in
+    m_frontLeft->setSpeed(leftSpeed);
+    m_backLeft->setSpeed(leftSpeed);
+    m_frontRight->setSpeed(rightSpeed);
+    m_backRight->setSpeed(rightSpeed);
 }
 
 bool MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY, double leftCm, double rightCm, double centerCm) {
@@ -158,4 +179,3 @@ bool MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY, do
     // add position tracking
     return false;
 }
-
