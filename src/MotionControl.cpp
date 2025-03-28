@@ -10,11 +10,13 @@ void MotionControl::goForward() {
     m_backLeft->run(FORWARD);
     m_backRight->run(FORWARD);
 
-    m_frontLeft->setSpeed(255);
-    m_frontRight->setSpeed(255);
-    m_backLeft->setSpeed(255);
-    m_backRight->setSpeed(255);   
- 
+    if (m_frontLeft->getSpeed() == 0) {
+        m_frontLeft->setSpeed(255);
+        m_frontRight->setSpeed(255);
+        m_backLeft->setSpeed(255);
+        m_backRight->setSpeed(255);   
+    }
+
     m_driveDir = FORWARD;
 }
 
@@ -28,10 +30,12 @@ void MotionControl::goBackward(){
     m_backLeft->run(BACKWARD);
     m_backRight->run(BACKWARD); 
 
-    m_frontLeft->setSpeed(255);
-    m_frontRight->setSpeed(255);
-    m_backLeft->setSpeed(255);
-    m_backRight->setSpeed(255);   
+    if (m_frontLeft->getSpeed() == 0) {
+        m_frontLeft->setSpeed(255);
+        m_frontRight->setSpeed(255);
+        m_backLeft->setSpeed(255);
+        m_backRight->setSpeed(255);   
+    }
  
     m_driveDir = BACKWARD;
 }
