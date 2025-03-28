@@ -217,9 +217,8 @@ void MotionControl::applyCorrection(double leftCm, double rightCm) {
 
 void MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY, double leftCm, double rightCm, double centerCm) {
     m_heading = calculateHeading(fromX, fromY, toX, toY);
-    double deltaHeading = fabs(m_heading - m_carRotation);
-    // FIX THIS SHIT
-    if (deltaHeading > 0.1 && deltaHeading < (3.0/4.0*PI)) {
+    double deltaHeading = fmod(fabs(m_heading - m_carRotation), 2*PI);
+    if (deltaHeading > 0.1 && fabs(deltaHeading - PI) > 0.1) {
         double diff = (m_heading - m_carRotation) / PI;
         if (fabs(fabs(diff) - 1.5) < 0.0001) {
             diff < -1.49 ?  goRight() : goLeft();
@@ -233,7 +232,7 @@ void MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY, do
         return;
     }
 
-    if (deltaHeading > 3.0/4.0*PI) {
+    if (fabs(deltaHeading - PI) <= 0.1) {
         goBackward();
         applyCorrection(leftCm, rightCm);
         return;
