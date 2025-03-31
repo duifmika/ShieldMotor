@@ -217,28 +217,25 @@ void MotionControl::applyCorrection(double leftCm, double rightCm) {
 
 void MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY, double leftCm, double rightCm, double centerCm) {
     m_heading = calculateHeading(fromX, fromY, toX, toY);
-    double deltaHeading = fmod(fabs(m_heading - m_carRotation), 2*PI);
-    if (deltaHeading > 0.1 && fabs(deltaHeading - PI) > 0.1) {
-        double diff = (m_heading - m_carRotation) / PI;
-        if (fabs(fabs(diff) - 1.5) < 0.0001) {
-            diff < -1.49 ?  goRight() : goLeft();
-        } else if (diff > 0) {
-            goRight();
-        } else if (diff < 0) {
-            goLeft();
-        }
+    CompassDirMC newDir = radiansToDirection(m_heading-m_carRotation);
 
+    if (newDir == CompassDirMC::East) {
+        goRight();
         m_carRotation = m_heading;
         return;
     }
 
-    if (fabs(deltaHeading - PI) <= 0.1) {
-        goBackward();
-        applyCorrection(leftCm, rightCm);
+    if (newDir == CompassDirMC::West) {
+        goLeft();
+        m_carRotation = m_heading;
         return;
     }
+    
+    if (newDir == CompassDirMC::North)
+        goForward();
+    else
+        goBackward();
 
-    goForward();
     applyCorrection(leftCm, rightCm);
 }
 
