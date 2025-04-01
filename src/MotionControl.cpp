@@ -54,7 +54,7 @@ void MotionControl::goLeft(){
     m_backLeft->setSpeed(150);
     m_backRight->setSpeed(150);   
 
-    delay(450);
+    delay(600);
     m_carRotation -= 0.5*PI;
     goBrake();
 }
@@ -73,7 +73,7 @@ void MotionControl::goRight(){
     m_backLeft->setSpeed(150);
     m_backRight->setSpeed(150);   
 
-    delay(450);
+    delay(600);
     m_carRotation += 0.5*PI;
     goBrake();
 }
@@ -170,7 +170,7 @@ void MotionControl::applyCorrection(double leftCm, double rightCm) {
     float pos_error = 0.0;
     float yaw_error = 0.0;
     
-    if (trustLeft || trustRight) {
+    if (trustLeft && trustRight) {
         // === POSITION ERROR ===
         pos_error = (leftCm - rightCm) / 2.0;
 
@@ -218,7 +218,7 @@ void MotionControl::applyCorrection(double leftCm, double rightCm) {
 void MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY, double leftCm, double rightCm, double centerCm) {
     m_heading = calculateHeading(fromX, fromY, toX, toY);
     CompassDirMC newDir = radiansToDirection(m_heading-m_carRotation);
-
+    
     if (newDir == CompassDirMC::East) {
         goRight();
         m_carRotation = m_heading;
