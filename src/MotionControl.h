@@ -7,7 +7,7 @@ enum class CompassDirMC : int8_t {
     West = (1 << 3)
 };
 
-#define BRAKE_TIME 600 
+#define BRAKE_TIME 400 
 
 class MotionControl {
 public:
@@ -19,6 +19,7 @@ public:
 private:
     double m_heading = 0.f; // direction of motion in radians where 0 is North (top of the maze)
     double m_carRotation = 0.f; // car rotation
+    int16_t m_rotTime = 420;
 
     double m_wallWidth;
     double m_cellWidth; // assuming square cells
@@ -33,6 +34,7 @@ public:
 
     double getHeading() const;
     double getCarRotation() const;
+    void setRotTime(int16_t time);
 
     void drive(double fromX, double fromY, int8_t toX, int8_t toY, double leftCm, double rightCm, double centerCm); 
     void applyCorrection(double leftCm, double rightCm);

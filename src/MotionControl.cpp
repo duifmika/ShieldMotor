@@ -54,7 +54,7 @@ void MotionControl::goLeft(){
     m_backLeft->setSpeed(150);
     m_backRight->setSpeed(150);   
 
-    delay(600);
+    delay(m_rotTime + 60);
     m_carRotation -= 0.5*PI;
     goBrake();
 }
@@ -68,14 +68,18 @@ void MotionControl::goRight(){
     m_backLeft->run(FORWARD);
     m_backRight->run(BACKWARD); 
 
-    m_frontLeft->setSpeed(150);
+    m_frontLeft->setSpeed(190);
     m_frontRight->setSpeed(150);
-    m_backLeft->setSpeed(150);
+    m_backLeft->setSpeed(190);
     m_backRight->setSpeed(150);   
 
-    delay(600);
+    delay(m_rotTime);
     m_carRotation += 0.5*PI;
     goBrake();
+}
+
+void MotionControl::setRotTime(int16_t time) {
+    m_rotTime = time;
 }
 
 void MotionControl::goBrake(int delayMs){
@@ -172,6 +176,12 @@ void MotionControl::applyCorrection(double leftCm, double rightCm) {
     
     if (trustLeft && trustRight) {
         // === POSITION ERROR ===
+        if (!trustLeft) {
+            leftCm = 15 - rightCm;
+        }
+        if (!trustRight) {
+            rightCm = 15 - leftCm;
+        }
         pos_error = (leftCm - rightCm) / 2.0;
 
         if (abs(pos_error) < centerDeadband) pos_error = 0;
