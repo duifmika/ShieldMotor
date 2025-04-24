@@ -82,8 +82,7 @@ void MotionControl::setRotTime(int16_t time) {
     m_rotTime = time;
 }
 
-void MotionControl::goBrake(int delayMs) {
-    int R = 100;
+void MotionControl::goBrake(int delayMs, int reverseMs) {
     if (m_frontLeft->getSpeed() == 0) {
         return;
     }
@@ -96,7 +95,7 @@ void MotionControl::goBrake(int delayMs) {
     m_frontRight->run((Direction)!m_driveDir);
     m_backLeft->run((Direction)!m_driveDir);
     m_backRight->run((Direction)!m_driveDir);
-    delay(R);
+    delay(reverseMs);
 
     m_frontLeft->run(RELEASE);
     m_frontRight->run(RELEASE);

@@ -8,6 +8,7 @@ enum class CompassDirMC : int8_t {
 };
 
 #define BRAKE_TIME 0 
+#define REVERSE_TIME 100
 
 class MotionControl {
 public:
@@ -42,7 +43,7 @@ public:
     void goBackward();
     void goLeft();
     void goRight();
-    void goBrake(int delayMs = BRAKE_TIME);
+    void goBrake(int delayMs = BRAKE_TIME, int reverseMs = REVERSE_TIME);
 
     double calculateDistance(double fromX, double fromY, int8_t toX, int8_t toY) const;
 private:
