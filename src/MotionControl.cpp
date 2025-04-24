@@ -92,10 +92,10 @@ void MotionControl::goBrake(int delayMs) {
     m_frontRight->setSpeed(255);
     m_backLeft->setSpeed(255);
     m_backRight->setSpeed(255);
-    m_frontLeft->run(!m_driveDir);
-    m_frontRight->run(!m_driveDir);
-    m_backLeft->run(!m_driveDir);
-    m_backRight->run(!m_driveDir);
+    m_frontLeft->run((Direction)!m_driveDir);
+    m_frontRight->run((Direction)!m_driveDir);
+    m_backLeft->run((Direction)!m_driveDir);
+    m_backRight->run((Direction)!m_driveDir);
     delay(R);
 
     m_frontLeft->run(RELEASE);
@@ -105,7 +105,6 @@ void MotionControl::goBrake(int delayMs) {
 
     delay(delayMs);
     m_driveDir = RELEASE;
-
 }
 
 void MotionControl::init(double cellWidth, double wallWidth, 
