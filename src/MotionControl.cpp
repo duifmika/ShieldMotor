@@ -30,13 +30,11 @@ void MotionControl::goBackward(){
     m_backLeft->run(BACKWARD);
     m_backRight->run(BACKWARD); 
 
-    if (m_frontLeft->getSpeed() == 0) {
-        m_frontLeft->setSpeed(255);
-        m_frontRight->setSpeed(255);
-        m_backLeft->setSpeed(255);
-        m_backRight->setSpeed(255);   
-    }
- 
+    m_frontLeft->setSpeed(255);
+    m_frontRight->setSpeed(255);
+    m_backLeft->setSpeed(255);
+    m_backRight->setSpeed(255);   
+
     m_driveDir = BACKWARD;
 }
 
@@ -56,7 +54,7 @@ void MotionControl::goLeft(){
 
     delay(m_rotTime + 60);
     m_carRotation -= 0.5*PI;
-    goBrake();
+    goBrake(100, 0);
 }
 
 void MotionControl::goRight(){
@@ -75,7 +73,7 @@ void MotionControl::goRight(){
 
     delay(m_rotTime);
     m_carRotation += 0.5*PI;
-    goBrake();
+    goBrake(100, 0);
 }
 
 void MotionControl::setRotTime(int16_t time) {
@@ -87,15 +85,18 @@ void MotionControl::goBrake(int delayMs, int reverseMs) {
         return;
     }
 
-    m_frontLeft->setSpeed(255);
-    m_frontRight->setSpeed(255);
-    m_backLeft->setSpeed(255);
-    m_backRight->setSpeed(255);
-    m_frontLeft->run((Direction)!m_driveDir);
-    m_frontRight->run((Direction)!m_driveDir);
-    m_backLeft->run((Direction)!m_driveDir);
-    m_backRight->run((Direction)!m_driveDir);
-    delay(reverseMs);
+    if (reverseMs <= 0) {
+        m_frontLeft->setSpeed(255);
+        m_frontRight->setSpeed(255);
+        m_backLeft->setSpeed(255);
+        m_backRight->setSpeed(255);
+
+        m_frontLeft->run((Direction)!m_driveDir);
+        m_frontRight->run((Direction)!m_driveDir);
+        m_backLeft->run((Direction)!m_driveDir);
+        m_backRight->run((Direction)!m_driveDir);
+        delay(reverseMs);
+    }
 
     m_frontLeft->run(RELEASE);
     m_frontRight->run(RELEASE);
