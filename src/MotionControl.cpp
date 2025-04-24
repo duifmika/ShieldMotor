@@ -85,7 +85,7 @@ void MotionControl::goBrake(int delayMs, int reverseMs) {
         return;
     }
 
-    if (reverseMs <= 0) {
+    if (reverseMs > 0) {
         m_frontLeft->setSpeed(255);
         m_frontRight->setSpeed(255);
         m_backLeft->setSpeed(255);
