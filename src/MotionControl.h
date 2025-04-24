@@ -7,7 +7,7 @@ enum class CompassDirMC : int8_t {
     West = (1 << 3)
 };
 
-#define BRAKE_TIME 400 
+#define BRAKE_TIME 0 
 
 class MotionControl {
 public:
