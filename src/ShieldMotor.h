@@ -25,9 +25,9 @@
 #define INVALID_MOTOR 0
 
 enum Direction : int8_t {
-    FORWARD  = 1,
-    BACKWARD = 2,
-    RELEASE  = 3,
+    FORWARD  = 0,
+    BACKWARD = 1,
+    RELEASE  = 2,
 };
 
 class ShieldMotor {
