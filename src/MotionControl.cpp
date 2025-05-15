@@ -56,10 +56,10 @@ void MotionControl::goBackward(){
     m_backLeft->run(BACKWARD);
     m_backRight->run(BACKWARD); 
 
-    m_frontLeft->setSpeed(255);
-    m_frontRight->setSpeed(255);
-    m_backLeft->setSpeed(255);
-    m_backRight->setSpeed(255);   
+    m_frontLeft->setSpeed(150);
+    m_frontRight->setSpeed(150);
+    m_backLeft->setSpeed(150);
+    m_backRight->setSpeed(150);   
 
     m_driveDir = BACKWARD;
 }
@@ -80,12 +80,14 @@ void MotionControl::goLeft(){
     m_backLeft->setSpeed(150);
     m_backRight->setSpeed(150);
 
-    while (m_yaw < 80) {
+    while (m_yaw > -70) {
         readMPU();
     }
-    //m_yaw  
 
     m_carRotation -= 0.5*PI;
+    goBrake(100, 0);
+    goBackward();
+    delay(60);
     goBrake(100, 0);
 }
 
@@ -100,15 +102,19 @@ void MotionControl::goRight(){
     m_backLeft->run(FORWARD);
     m_backRight->run(BACKWARD); 
 
-    m_frontLeft->setSpeed(190);
+    m_frontLeft->setSpeed(150);
     m_frontRight->setSpeed(150);
-    m_backLeft->setSpeed(190);
+    m_backLeft->setSpeed(150);
     m_backRight->setSpeed(150);   
 
-    while (m_yaw > -80) {
+    while (m_yaw < 70) {
         readMPU();
     }
+
     m_carRotation += 0.5*PI;
+    goBrake(100, 0);
+    goBackward();
+    delay(60);
     goBrake(100, 0);
 }
 
@@ -198,7 +204,7 @@ void MotionControl::applyCorrection(double leftCm, double rightCm) {
     const float Kp_yaw = 5.8;
     const float Kd_yaw = 2.2;
 
-    const int baseSpeed = 255;
+    const int baseSpeed = 150;
     const int controlInterval = 50; 
 
     static float centerDeadband = 1.0; 
