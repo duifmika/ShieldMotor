@@ -150,9 +150,9 @@ CompassDirMC MotionControl::radiansToDirection(double angleRad) const {
 
 
 void MotionControl::applyCorrection(double leftCm, double rightCm) {
-    const float Kp_pos = 4.5;
+    const float Kp_pos = 5.5;
     const float Kd_pos = 2.5;
-    const float Kp_yaw = 3.8;
+    const float Kp_yaw = 5.8;
     const float Kd_yaw = 2.2;
 
     const int baseSpeed = 255;
