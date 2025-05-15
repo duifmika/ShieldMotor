@@ -1,5 +1,6 @@
 #include "MotionControl.h"
 #include <math.h>
+#include <Wire.h>
 
 void MotionControl::goForward() {
     if (m_driveDir != FORWARD)
@@ -20,6 +21,31 @@ void MotionControl::goForward() {
     m_driveDir = FORWARD;
 }
 
+MPU MotionControl::readMPU() {
+    MPU mpu = {0};
+    Wire.beginTransmission(0x68);
+    Wire.write(0x43);  // Starting with register 0x43 (GYRO_XOUT_H)
+    Wire.endTransmission(false);
+    Wire.requestFrom(0x68, 6, true);  // Request 6 bytes (3 for gyroscope)
+
+    // Read gyroscope values
+    mpu.gx = Wire.read() << 8 | Wire.read();  // GYRO_XOUT_H, GYRO_XOUT_L
+    mpu.gy = Wire.read() << 8 | Wire.read();  // GYRO_YOUT_H, GYRO_YOUT_L
+    mpu.gz = Wire.read() << 8 | Wire.read();  // GYRO_ZOUT_H, GYRO_ZOUT_L
+
+    // Convert raw gyroscope data to degrees per second (assuming ±250°/s range)
+    mpu.gx = mpu.gx / 131.0;  // 131 LSB/°/s for ±250°/s range
+    mpu.gy = mpu.gy / 131.0;
+    mpu.gz = mpu.gz / 131.0;
+
+    static unsigned long lastTime = millis();
+    double dt = (millis() - lastTime) / 1000.;
+    lastTime = millis();
+    if (abs(mpu.gz) > 2. && dt < 0.020)
+        m_yaw += mpu.gz*dt;
+
+    return mpu;
+}
 
 void MotionControl::goBackward(){
     if (m_driveDir != BACKWARD)
@@ -118,6 +144,13 @@ void MotionControl::init(double cellWidth, double wallWidth,
     m_frontRight = frontRight;
     m_backLeft = backLeft;
     m_backRight = backRight;
+
+    Wire.begin();  // Initialize I2C
+    Wire.beginTransmission(0x68);
+    Wire.write(0x6B);  // Power management register
+    Wire.write(0);     // Wake up
+    Wire.endTransmission(true);
+
 }
 
 double MotionControl::getHeading() const {

@@ -7,6 +7,11 @@ enum class CompassDirMC : int8_t {
     West = (1 << 3)
 };
 
+struct MPU {
+    double gx, gy, gz;
+    double ax, ay, az;
+};
+
 #define BRAKE_TIME 0 
 #define REVERSE_TIME 100
 
@@ -20,6 +25,7 @@ public:
 private:
     double m_heading = 0.f; // direction of motion in radians where 0 is North (top of the maze)
     double m_carRotation = 0.f; // car rotation
+    double m_yaw; // gyroscopic rotation
     int16_t m_rotTime = 420;
 
     double m_wallWidth;
@@ -29,12 +35,13 @@ private:
     ShieldMotor* m_frontRight;
     ShieldMotor* m_backLeft;
     ShieldMotor* m_backRight;
-
+    
 public:
     Direction m_driveDir = FORWARD;
 
     double getHeading() const;
     double getCarRotation() const;
+    MPU readMPU();
     void setRotTime(int16_t time);
 
     void drive(double fromX, double fromY, int8_t toX, int8_t toY, double leftCm, double rightCm, double centerCm); 
