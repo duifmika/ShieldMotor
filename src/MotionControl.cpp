@@ -42,7 +42,7 @@ MPU MotionControl::readMPU() {
     double dt = (millis() - lastTime) / 1000.;
     lastTime = millis();
     if (abs(mpu.gz) > 2. && dt < 0.020)
-        m_yaw += mpu.gz*dt;
+        m_yaw += -mpu.gz*dt;
 
     return mpu;
 }
@@ -68,17 +68,23 @@ void MotionControl::goLeft(){
     if (m_driveDir != RELEASE)
         goBrake();
 
+    m_yaw = 0.;
+
     m_frontLeft->run(BACKWARD);
     m_frontRight->run(FORWARD);
     m_backLeft->run(BACKWARD);
-    m_backRight->run(FORWARD);   
-    
+    m_backRight->run(FORWARD);
+
     m_frontLeft->setSpeed(150);
     m_frontRight->setSpeed(150);
     m_backLeft->setSpeed(150);
-    m_backRight->setSpeed(150);   
+    m_backRight->setSpeed(150);
 
-    delay(m_rotTime + 60);
+    while (m_yaw < 80) {
+        readMPU();
+    }
+    //m_yaw  
+
     m_carRotation -= 0.5*PI;
     goBrake(100, 0);
 }
@@ -86,6 +92,8 @@ void MotionControl::goLeft(){
 void MotionControl::goRight(){
     if (m_driveDir != RELEASE)
         goBrake();
+
+    m_yaw = 0;
 
     m_frontLeft->run(FORWARD);
     m_frontRight->run(BACKWARD);
@@ -97,7 +105,9 @@ void MotionControl::goRight(){
     m_backLeft->setSpeed(190);
     m_backRight->setSpeed(150);   
 
-    delay(m_rotTime);
+    while (m_yaw > -80) {
+        readMPU();
+    }
     m_carRotation += 0.5*PI;
     goBrake(100, 0);
 }
