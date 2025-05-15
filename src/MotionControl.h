@@ -25,7 +25,7 @@ public:
 private:
     double m_heading = 0.f; // direction of motion in radians where 0 is North (top of the maze)
     double m_carRotation = 0.f; // car rotation
-    double m_yaw; // gyroscopic rotation
+    double m_yaw = 0.; // gyroscopic rotation
     int16_t m_rotTime = 420;
 
     double m_wallWidth;
