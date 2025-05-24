@@ -70,6 +70,7 @@ void MotionControl::goLeft(){
 
     m_yaw = 0.;
 
+    // LEFT TURN
     m_frontLeft->run(BACKWARD);
     m_frontRight->run(FORWARD);
     m_backLeft->run(BACKWARD);
@@ -84,10 +85,11 @@ void MotionControl::goLeft(){
         readMPU();
     }
 
+    // BRAKE
+    goBrake(100, 0);
     m_carRotation -= 0.5*PI;
 
-    goBrake(100, 0);
-
+    // RIGHT STRAFE
     m_frontLeft->run(FORWARD);
     m_frontRight->run(BACKWARD);
     m_backLeft->run(BACKWARD);
@@ -98,12 +100,15 @@ void MotionControl::goLeft(){
     m_backLeft->setSpeed(150);
     m_backRight->setSpeed(150);
 
+    // BRAKE 
     delay(250);
     goBrake(100, 0);
 
+    // BACKWARD SHIFT 
     goBackward();
     delay(250);
 
+    // BRAKE
     goBrake(100, 0);
 }
 
@@ -113,6 +118,7 @@ void MotionControl::goRight(){
 
     m_yaw = 0;
 
+    // RIGHT TURN
     m_frontLeft->run(FORWARD);
     m_frontRight->run(BACKWARD);
     m_backLeft->run(FORWARD);
@@ -127,9 +133,12 @@ void MotionControl::goRight(){
         readMPU();
     }
 
-    m_carRotation += 0.5*PI;
+    // BRAKE
     goBrake(100, 0);
 
+    m_carRotation += 0.5*PI;
+
+    // LEFT STRAFE 
     m_frontLeft->run(BACKWARD);
     m_frontRight->run(FORWARD);
     m_backLeft->run(FORWARD);
@@ -141,16 +150,16 @@ void MotionControl::goRight(){
     m_backRight->setSpeed(150);
 
     delay(250);
+    
+    // BRAKE
     goBrake(100, 0);
 
+    // BACKWARD SHIFT 
     goBackward();
     delay(250);
 
+    // BRAKE
     goBrake(100, 0);
-}
-
-void MotionControl::setRotTime(int16_t time) {
-    m_rotTime = time;
 }
 
 void MotionControl::goBrake(int delayMs, int reverseMs) {
