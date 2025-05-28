@@ -81,7 +81,7 @@ void MotionControl::goLeft(){
     m_backLeft->setSpeed(150);
     m_backRight->setSpeed(150);
 
-    while (m_yaw > -70) {
+    while (m_yaw > -63) {
         readMPU();
     }
 
@@ -129,7 +129,7 @@ void MotionControl::goRight(){
     m_backLeft->setSpeed(150);
     m_backRight->setSpeed(150);   
 
-    while (m_yaw < 70) {
+    while (m_yaw < 60) {
         readMPU();
     }
 
@@ -326,6 +326,10 @@ void MotionControl::applyCorrection(double leftCm, double rightCm) {
 }
 
 void MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY, double leftCm, double rightCm, double centerCm) {
+    if ((int8_t)round(fromX) == toX && (int8_t)round(fromY) == toY) {
+        return;
+    }
+
     m_heading = calculateHeading(fromX, fromY, toX, toY);
     CompassDirMC newDir = radiansToDirection(m_heading-m_carRotation);
     
