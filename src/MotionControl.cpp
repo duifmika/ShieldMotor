@@ -64,6 +64,32 @@ void MotionControl::goBackward(){
     m_driveDir = BACKWARD;
 }
 
+void MotionControl::go180(){
+    if (m_driveDir != RELEASE)
+        goBrake();
+
+    m_yaw = 0;
+
+    // RIGHT TURN
+    m_frontLeft->run(FORWARD);
+    m_frontRight->run(BACKWARD);
+    m_backLeft->run(FORWARD);
+    m_backRight->run(BACKWARD); 
+
+    m_frontLeft->setSpeed(150);
+    m_frontRight->setSpeed(150);
+    m_backLeft->setSpeed(150);
+    m_backRight->setSpeed(150);   
+
+    while (m_yaw < 160) {
+        readMPU();
+    }
+
+    // BRAKE
+    goBrake(100, 0);
+
+    m_carRotation += PI;
+}
 void MotionControl::goLeft(){
     if (m_driveDir != RELEASE)
         goBrake();
@@ -240,12 +266,12 @@ CompassDirMC MotionControl::radiansToDirection(double angleRad) const {
 
 void MotionControl::applyCorrection(double leftCm, double rightCm) {
     const float Kp_pos = 5.5;
-    const float Kd_pos = 2.5;
-    const float Kp_yaw = 4.8;
-    const float Kd_yaw = 2.2;
+    const float Kd_pos = 3.5;
+    const float Kp_yaw = 7.;
+    const float Kd_yaw = 4.;
 
     const int baseSpeed = 150;
-    const int controlInterval = 50; 
+    const int controlInterval = 1; 
 
     static float centerDeadband = 1.0; 
 
@@ -347,8 +373,11 @@ void MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY, do
     
     if (newDir == CompassDirMC::North)
         goForward();
-    else
-        goBackward();
+    else {
+        go180();
+        m_carRotation = m_heading;
+        goForward();
+    }
 
     applyCorrection(leftCm, rightCm);
 }

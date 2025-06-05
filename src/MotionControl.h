@@ -46,6 +46,7 @@ public:
     void applyCorrection(double leftCm, double rightCm);
     void goForward();
     void goBackward();
+    void go180();
     void goLeft();
     void goRight();
     void goBrake(int delayMs = BRAKE_TIME, int reverseMs = REVERSE_TIME);
