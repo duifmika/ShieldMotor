@@ -278,8 +278,6 @@ void MotionControl::applyCorrection(double leftCm, double rightCm) {
     const float Kd_yaw = 4.;
 
     const int baseSpeed = 150;
-    const int controlInterval = 1; 
-
     static float centerDeadband = 1.0; 
 
     // PID state
@@ -287,17 +285,17 @@ void MotionControl::applyCorrection(double leftCm, double rightCm) {
     static float prev_error_yaw = 0;
     static float prev_dLeft = 0;
     static float prev_dRight = 0;
-    static unsigned long lastTime = 0;
+    static unsigned long lastTime = millis();
 
-    if (millis() - lastTime < controlInterval) {
+    unsigned long dt = lastTime - millis(); 
+
+    if (dt == 0) 
         return;
-    }
-
-    // for now I added back the offset.
+    
+    lastTime = millis();
+    
     leftCm += 2.5;
     rightCm += 2.5;
-
-    lastTime = millis();
 
     bool trustLeft = (leftCm <= 12.0);
     bool trustRight = (rightCm <= 12.0);
@@ -307,7 +305,7 @@ void MotionControl::applyCorrection(double leftCm, double rightCm) {
     float pos_error = 0.0;
     float yaw_error = 0.0;
     
-    if (trustLeft && trustRight) {
+    if ((trustLeft || trustRight) && dt < 150) {
         // === POSITION ERROR ===
         if (!trustLeft) {
             leftCm = 15 - rightCm;
@@ -319,7 +317,7 @@ void MotionControl::applyCorrection(double leftCm, double rightCm) {
 
         if (abs(pos_error) < centerDeadband) pos_error = 0;
 
-        float derivative_pos = (pos_error - prev_error_pos) / (controlInterval / 1000.0);
+        float derivative_pos = (pos_error - prev_error_pos) / (dt / 1000.0);
         correction_pos = Kp_pos * pos_error + Kd_pos * derivative_pos;
         correction_pos = constrain(correction_pos, -55.0, 55.0);
         prev_error_pos = pos_error;
@@ -331,7 +329,7 @@ void MotionControl::applyCorrection(double leftCm, double rightCm) {
 
         if (abs(yaw_error) < 0.5) yaw_error = 0;
 
-        float derivative_yaw = (yaw_error - prev_error_yaw) / (controlInterval / 1000.0);
+        float derivative_yaw = (yaw_error - prev_error_yaw) / (dt / 1000.0);
         correction_yaw = Kp_yaw * yaw_error + Kd_yaw * derivative_yaw;
         correction_yaw = constrain(correction_yaw, -55.0, 55.0);
         prev_error_yaw = yaw_error;
