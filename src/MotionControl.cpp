@@ -3,8 +3,10 @@
 #include <Wire.h>
 
 void MotionControl::goForward() {
-    if (m_driveDir != FORWARD)
-        goBrake();
+    if (m_driveDir == FORWARD)
+        return;
+
+    goBrake();
 
     m_frontLeft->run(FORWARD);
     m_frontRight->run(FORWARD);
@@ -197,6 +199,7 @@ void MotionControl::goRight(){
 
 void MotionControl::goBrake(int delayMs, int reverseMs) {
     if (m_frontLeft->getSpeed() == 0) {
+        m_driveDir = RELEASE;
         return;
     }
 
@@ -381,7 +384,7 @@ void MotionControl::drive(double fromX, double fromY, int8_t toX, int8_t toY, do
     else {
         go180();
         m_carRotation = m_heading;
-        goForward();
+        return;
     }
 
     applyCorrection(leftCm, rightCm);
