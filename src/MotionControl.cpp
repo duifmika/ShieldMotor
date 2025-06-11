@@ -89,6 +89,13 @@ void MotionControl::go180(){
     goBrake(100, 0);
 
     m_carRotation += PI;
+
+    // BACKWARD SHIFT 
+    goBackward();
+    delay(250);
+
+    // BRAKE
+    goBrake(100, 0);
 }
 void MotionControl::goLeft(){
     if (m_driveDir != RELEASE)
