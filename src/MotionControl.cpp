@@ -287,7 +287,7 @@ void MotionControl::applyCorrection(double leftCm, double rightCm) {
     static float prev_dRight = 0;
     static unsigned long lastTime = millis();
 
-    unsigned long dt = lastTime - millis(); 
+    unsigned long dt = millis() - lastTime; 
 
     if (dt == 0) 
         return;
