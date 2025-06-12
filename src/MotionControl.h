@@ -36,7 +36,7 @@ private:
     ShieldMotor* m_backRight;
     
 public:
-    Direction m_driveDir = FORWARD;
+    Direction m_driveDir = RELEASE;
 
     double getHeading() const;
     double getCarRotation() const;
